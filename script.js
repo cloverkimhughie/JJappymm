@@ -1,7 +1,14 @@
 const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn');
 let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt;
 
-function spawn(){const r=35,x=r+Math.random()*(arena.clientWidth-r*2),y=r+Math.random()*(arena.clientHeight-r*2);target.style.left=x+'px';target.style.top=y+'px';targetShownAt=performance.now();}
+function spawn(){
+  const r=35;
+  const x=r+Math.random()*(arena.clientWidth-r*2);
+  const y=r+Math.random()*(arena.clientHeight-r*2);
+  target.style.left=x+'px';
+  target.style.top=y+'px';
+  targetShownAt=performance.now();
+}
 
 function updateStats(){
   scoreEl.textContent=score;
@@ -28,29 +35,40 @@ function tick(){
   raf=requestAnimationFrame(tick);
 }
 
-target.addEventListener('pointerdown',e=>{
+arena.addEventListener('pointerdown',e=>{
   if(!running)return;
-  e.stopPropagation();
+
+  const rect=target.getBoundingClientRect();
+  const cx=rect.left+rect.width/2;
+  const cy=rect.top+rect.height/2;
+  const dx=e.clientX-cx;
+  const dy=e.clientY-cy;
+  const radius=Math.min(rect.width,rect.height)/2;
+  const isHit=(dx*dx+dy*dy)<=radius*radius;
+
   e.preventDefault();
   shots++;
-  hits++;
-  const reaction=performance.now()-targetShownAt;
-  reactions.push(reaction);
-  score+=100+Math.max(0,Math.round(300-reaction));
-  updateStats();
-  spawn();
-});
 
-arena.addEventListener('pointerdown',e=>{
-  if(!running||e.target===target)return;
-  shots++;
-  misses++;
-  score=Math.max(0,score-25);
-  updateStats();
+  if(isHit){
+    hits++;
+    const reaction=performance.now()-targetShownAt;
+    reactions.push(reaction);
+    score+=100+Math.max(0,Math.round(300-reaction));
+    updateStats();
+    spawn();
+  }else{
+    misses++;
+    score=Math.max(0,score-25);
+    updateStats();
+  }
 });
 
 btn.addEventListener('click',()=>{
-  score=0;hits=0;misses=0;shots=0;reactions=[];
+  score=0;
+  hits=0;
+  misses=0;
+  shots=0;
+  reactions=[];
   updateStats();
   timeEl.textContent='30.0';
   running=true;
