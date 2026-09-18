@@ -1,4 +1,4 @@
-const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn');
+const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn'),result=document.getElementById('result');
 let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt;
 
 function spawn(){
@@ -23,7 +23,9 @@ function finish(){
   target.hidden=true;
   start.hidden=false;
   start.querySelector('h2').textContent='훈련 종료!';
-  start.querySelector('p').textContent='점수 '+score+' · 명중 '+hits+' · 빗나감 '+misses+' · 평균 '+avgEl.textContent+'ms · 명중률 '+accEl.textContent+'%';
+  start.querySelector('p').textContent='훈련 결과';
+  result.textContent='점수 '+score+'\n명중 '+hits+' · 빗나감 '+misses+'\n명중률 '+accEl.textContent+'% · 평균 '+avgEl.textContent+'ms';
+  start.dataset.finished='true';
   btn.textContent='다시 시작';
 }
 
@@ -70,6 +72,10 @@ btn.addEventListener('click',()=>{
   shots=0;
   reactions=[];
   updateStats();
+  result.textContent='';
+  delete start.dataset.finished;
+  start.querySelector('h2').textContent='30초 에임 연습';
+  start.querySelector('p').textContent='타겟을 최대한 빠르게 클릭하세요.';
   timeEl.textContent='30.0';
   running=true;
   start.hidden=true;
