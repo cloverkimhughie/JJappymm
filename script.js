@@ -1,4 +1,5 @@
-const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn'),result=document.getElementById('result');
+const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn'),result=document.getElementById('result'),sensitivity=document.getElementById('sensitivity'),sensitivityValue=document.getElementById('sensitivityValue');
+let sensitivityLevel=1.0;
 let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt;
 
 function spawn(){
@@ -64,6 +65,8 @@ arena.addEventListener('pointerdown',e=>{
     updateStats();
   }
 });
+
+sensitivity.addEventListener('input',()=>{sensitivityLevel=Number(sensitivity.value);sensitivityValue.textContent=sensitivityLevel.toFixed(2);});
 
 btn.addEventListener('click',()=>{
   score=0;
