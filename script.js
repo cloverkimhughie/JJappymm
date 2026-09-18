@@ -1,0 +1,6 @@
+const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),btn=document.getElementById('startBtn');let score=0,hits=0,running=false,endAt,raf;
+function spawn(){const r=35,x=r+Math.random()*(arena.clientWidth-r*2),y=r+Math.random()*(arena.clientHeight-r*2);target.style.left=x+'px';target.style.top=y+'px';}
+function finish(){running=false;target.hidden=true;start.hidden=false;start.querySelector('h2').textContent='훈련 종료!';start.querySelector('p').textContent='점수: '+score+' · 명중: '+hits;btn.textContent='다시 시작';}
+function tick(){if(!running)return;const left=Math.max(0,endAt-performance.now())/1000;timeEl.textContent=left.toFixed(1);if(left<=0){finish();return}raf=requestAnimationFrame(tick)}
+target.addEventListener('click',e=>{if(!running)return;e.stopPropagation();score+=100;hits++;scoreEl.textContent=score;hitsEl.textContent=hits;spawn()});
+btn.addEventListener('click',()=>{score=0;hits=0;scoreEl.textContent=0;hitsEl.textContent=0;timeEl.textContent='30.0';running=true;start.hidden=true;target.hidden=false;spawn();endAt=performance.now()+30000;cancelAnimationFrame(raf);tick()});
