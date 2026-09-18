@@ -2,12 +2,13 @@ const arena=document.getElementById('arena'),target=document.getElementById('tar
 let sensitivityLevel=1.0;
 let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt;
 
+function moveTarget(x,y){target.style.left=x+'px';target.style.top=y+'px';}
+
 function spawn(){
   const r=35;
   const x=r+Math.random()*(arena.clientWidth-r*2);
   const y=r+Math.random()*(arena.clientHeight-r*2);
-  target.style.left=x+'px';
-  target.style.top=y+'px';
+  moveTarget(x,y);
   targetShownAt=performance.now();
 }
 
@@ -37,6 +38,20 @@ function tick(){
   if(left<=0){finish();return;}
   raf=requestAnimationFrame(tick);
 }
+
+let lastMouseX=0,lastMouseY=0,mouseInitialized=false;
+
+arena.addEventListener('pointermove',e=>{
+  if(!running)return;
+  if(!mouseInitialized){lastMouseX=e.clientX;lastMouseY=e.clientY;mouseInitialized=true;return;}
+  const dx=e.clientX-lastMouseX,dy=e.clientY-lastMouseY;
+  lastMouseX=e.clientX;lastMouseY=e.clientY;
+  if(!e.buttons)return;
+  const rect=target.getBoundingClientRect();
+  const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  const nx=cx+dx*(sensitivityLevel-1),ny=cy+dy*(sensitivityLevel-1);
+  if(sensitivityLevel!==1)moveTarget(nx-arena.getBoundingClientRect().left,ny-arena.getBoundingClientRect().top);
+});
 
 arena.addEventListener('pointerdown',e=>{
   if(!running)return;
@@ -81,6 +96,7 @@ btn.addEventListener('click',()=>{
   start.querySelector('p').textContent='타겟을 최대한 빠르게 클릭하세요.';
   timeEl.textContent='30.0';
   running=true;
+  mouseInitialized=false;
   start.hidden=true;
   target.hidden=false;
   spawn();
