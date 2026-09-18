@@ -1,4 +1,4 @@
-const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn'),result=document.getElementById('result'),sensitivity=document.getElementById('sensitivity'),sensitivityValue=document.getElementById('sensitivityValue'),crosshair=document.getElementById('crosshair');
+const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn'),result=document.getElementById('result'),crosshair=document.getElementById('crosshair');
 let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt,sensitivityLevel=1,mouseX=0,mouseY=0;
 
 function spawn(){
@@ -25,10 +25,6 @@ function tick(){
 function placeCrosshair(){
   crosshair.style.left=mouseX+'px';crosshair.style.top=mouseY+'px';
 }
-sensitivity.addEventListener('input',()=>{
-  sensitivityLevel=Number(sensitivity.value);
-  sensitivityValue.textContent=sensitivityLevel.toFixed(2);
-});
 arena.addEventListener('mousemove',e=>{
   if(!running||document.pointerLockElement!==arena)return;
   mouseX=Math.max(0,Math.min(arena.clientWidth,mouseX+e.movementX*sensitivityLevel));
