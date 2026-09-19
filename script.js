@@ -1,5 +1,5 @@
 const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn'),result=document.getElementById('result'),crosshair=document.getElementById('crosshair');
-let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt,sensitivityLevel=1,mouseX=0,mouseY=0;
+let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt,sensitivityLevel=1,mouseX=0,mouseY=0,trainingSeconds=30;
 
 function spawn(){
   const r=35,x=r+Math.random()*(arena.clientWidth-r*2),y=r+Math.random()*(arena.clientHeight-r*2);
@@ -47,11 +47,22 @@ arena.addEventListener('mousedown',e=>{
 document.addEventListener('pointerlockchange',()=>{
   if(running&&document.pointerLockElement!==arena)finish();
 });
+const timeBtns=[...document.querySelectorAll('.timeBtn')],selectedTime=document.getElementById('selectedTime'),minusTime=document.getElementById('minusTime'),plusTime=document.getElementById('plusTime');
+function setTrainingTime(seconds){
+  trainingSeconds=Math.max(5,Math.min(600,seconds));
+  selectedTime.textContent=trainingSeconds+'초';
+  timeEl.textContent=trainingSeconds.toFixed(1);
+  timeBtns.forEach(b=>b.classList.toggle('selected',Number(b.dataset.time)===trainingSeconds));
+}
+timeBtns.forEach(b=>b.addEventListener('click',()=>setTrainingTime(Number(b.dataset.time))));
+minusTime.addEventListener('click',()=>setTrainingTime(trainingSeconds-5));
+plusTime.addEventListener('click',()=>setTrainingTime(trainingSeconds+5));
+
 btn.addEventListener('click',()=>{
   score=0;hits=0;misses=0;shots=0;reactions=[];
   updateStats();result.textContent='';delete start.dataset.finished;
   start.querySelector('h2').textContent='30초 에임 연습';start.querySelector('p').textContent='타겟을 최대한 빠르게 클릭하세요.';
-  timeEl.textContent='30.0';running=true;start.hidden=true;target.hidden=false;crosshair.hidden=false;
+  timeEl.textContent=trainingSeconds.toFixed(1);running=true;start.hidden=true;target.hidden=false;crosshair.hidden=false;
   mouseX=arena.clientWidth/2;mouseY=arena.clientHeight/2;placeCrosshair();spawn();
-  endAt=performance.now()+30000;cancelAnimationFrame(raf);tick();arena.requestPointerLock();
+  endAt=performance.now()+trainingSeconds*1000;cancelAnimationFrame(raf);tick();arena.requestPointerLock();
 });
