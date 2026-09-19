@@ -25,6 +25,33 @@ function tick(){
 function placeCrosshair(){
   crosshair.style.left=mouseX+'px';crosshair.style.top=mouseY+'px';
 }
+
+let audioContext=null;
+function playHitSound(){
+  try{
+    if(!audioContext){
+      audioContext=new (window.AudioContext||window.webkitAudioContext)();
+    }
+    if(audioContext.state==='suspended')audioContext.resume();
+
+    const now=audioContext.currentTime;
+    const osc=audioContext.createOscillator();
+    const gain=audioContext.createGain();
+
+    osc.type='sine';
+    osc.frequency.setValueAtTime(520,now);
+    osc.frequency.exponentialRampToValueAtTime(220,now+0.07);
+
+    gain.gain.setValueAtTime(0.0001,now);
+    gain.gain.exponentialRampToValueAtTime(0.18,now+0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001,now+0.09);
+
+    osc.connect(gain);
+    gain.connect(audioContext.destination);
+    osc.start(now);
+    osc.stop(now+0.1);
+  }catch(err){}
+}
 arena.addEventListener('mousemove',e=>{
   if(!running||document.pointerLockElement!==arena)return;
   mouseX=Math.max(0,Math.min(arena.clientWidth,mouseX+e.movementX*sensitivityLevel));
@@ -40,7 +67,7 @@ arena.addEventListener('mousedown',e=>{
   shots++;
   if(dx*dx+dy*dy<=radius*radius){
     hits++;const reaction=performance.now()-targetShownAt;reactions.push(reaction);
-    score+=100+Math.max(0,Math.round(300-reaction));spawn();
+    score+=100+Math.max(0,Math.round(300-reaction));playHitSound();spawn();
   }else{misses++;score=Math.max(0,score-25)}
   updateStats();
 });
