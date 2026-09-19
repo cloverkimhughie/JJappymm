@@ -13,6 +13,20 @@
     <h2>30초 에임 연습</h2>
     <p>타겟을 최대한 빠르게 클릭하세요.</p>
     <div id="result"></div>
+    <div id="timeSelector">
+      <span>훈련 시간</span>
+      <div class="timeButtons">
+        <button type="button" class="timeBtn" data-time="15">15초</button>
+        <button type="button" class="timeBtn selected" data-time="30">30초</button>
+        <button type="button" class="timeBtn" data-time="60">60초</button>
+        <button type="button" class="timeBtn" data-time="120">120초</button>
+      </div>
+      <div class="customTime">
+        <button type="button" id="minusTime">−</button>
+        <b id="selectedTime">30초</b>
+        <button type="button" id="plusTime">+</button>
+      </div>
+    </div>
     <button id="startBtn">시작</button>
   </div>
   <div id="target" hidden></div><div id="crosshair" hidden></div>
