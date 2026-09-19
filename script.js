@@ -1,9 +1,18 @@
 const arena=document.getElementById('arena'),target=document.getElementById('target'),start=document.getElementById('start'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),hitsEl=document.getElementById('hits'),missesEl=document.getElementById('misses'),accEl=document.getElementById('accuracy'),avgEl=document.getElementById('avgReaction'),btn=document.getElementById('startBtn'),result=document.getElementById('result'),crosshair=document.getElementById('crosshair');
-let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt,sensitivityLevel=1,mouseX=0,mouseY=0,trainingSeconds=30;
+let score=0,hits=0,misses=0,shots=0,reactions=[],running=false,endAt,raf,targetShownAt,sensitivityLevel=1,mouseX=0,mouseY=0,trainingSeconds=30,targetSize=55;
 
 function spawn(){
-  const r=35,x=r+Math.random()*(arena.clientWidth-r*2),y=r+Math.random()*(arena.clientHeight-r*2);
-  target.style.left=x+'px';target.style.top=y+'px';targetShownAt=performance.now();
+  const r=targetSize/2+8;
+  const x=r+Math.random()*Math.max(1,arena.clientWidth-r*2);
+  const y=r+Math.random()*Math.max(1,arena.clientHeight-r*2);
+  target.style.left=x+'px';
+  target.style.top=y+'px';
+  targetShownAt=performance.now();
+}
+
+function applyTargetSize(){
+  target.style.width=targetSize+'px';
+  target.style.height=targetSize+'px';
 }
 function updateStats(){
   scoreEl.textContent=score;hitsEl.textContent=hits;missesEl.textContent=misses;
@@ -114,11 +123,49 @@ plusTime.addEventListener('click',event=>{
 
 setTrainingTime(trainingSeconds);
 
+const sizeBtns=Array.from(document.querySelectorAll('.sizeBtn'));
+const selectedSize=document.getElementById('selectedSize');
+const minusSize=document.getElementById('minusSize');
+const plusSize=document.getElementById('plusSize');
+
+function setTargetSize(size){
+  targetSize=Math.max(20,Math.min(120,Number(size)));
+  selectedSize.textContent=targetSize+'px';
+  sizeBtns.forEach(button=>{
+    const isSelected=Number(button.dataset.size)===targetSize;
+    button.classList.toggle('selected',isSelected);
+    button.setAttribute('aria-pressed',String(isSelected));
+  });
+  applyTargetSize();
+}
+
+sizeBtns.forEach(button=>{
+  button.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    setTargetSize(button.dataset.size);
+  });
+});
+
+minusSize.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopPropagation();
+  setTargetSize(targetSize-5);
+});
+
+plusSize.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopPropagation();
+  setTargetSize(targetSize+5);
+});
+
+setTargetSize(targetSize);
+
 btn.addEventListener('click',()=>{
   score=0;hits=0;misses=0;shots=0;reactions=[];
   updateStats();result.textContent='';delete start.dataset.finished;
   start.querySelector('h2').textContent=trainingSeconds+'초 에임 연습';start.querySelector('p').textContent='타겟을 최대한 빠르게 클릭하세요.';
   timeEl.textContent=trainingSeconds.toFixed(1);running=true;start.hidden=true;target.hidden=false;crosshair.hidden=false;
-  mouseX=arena.clientWidth/2;mouseY=arena.clientHeight/2;placeCrosshair();spawn();
+  mouseX=arena.clientWidth/2;mouseY=arena.clientHeight/2;placeCrosshair();applyTargetSize();spawn();
   endAt=performance.now()+trainingSeconds*1000;cancelAnimationFrame(raf);tick();arena.requestPointerLock();
 });
