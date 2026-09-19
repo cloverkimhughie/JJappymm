@@ -47,21 +47,50 @@ arena.addEventListener('mousedown',e=>{
 document.addEventListener('pointerlockchange',()=>{
   if(running&&document.pointerLockElement!==arena)finish();
 });
-const timeBtns=[...document.querySelectorAll('.timeBtn')],selectedTime=document.getElementById('selectedTime'),minusTime=document.getElementById('minusTime'),plusTime=document.getElementById('plusTime');
+const timeBtns=Array.from(document.querySelectorAll('.timeBtn'));
+const selectedTime=document.getElementById('selectedTime');
+const minusTime=document.getElementById('minusTime');
+const plusTime=document.getElementById('plusTime');
+
 function setTrainingTime(seconds){
-  trainingSeconds=Math.max(5,Math.min(600,seconds));
+  trainingSeconds=Math.max(5,Math.min(600,Number(seconds)));
   selectedTime.textContent=trainingSeconds+'초';
   timeEl.textContent=trainingSeconds.toFixed(1);
-  timeBtns.forEach(b=>b.classList.toggle('selected',Number(b.dataset.time)===trainingSeconds));
+  start.querySelector('h2').textContent=trainingSeconds+'초 에임 연습';
+
+  timeBtns.forEach(button=>{
+    const isSelected=Number(button.dataset.time)===trainingSeconds;
+    button.classList.toggle('selected',isSelected);
+    button.setAttribute('aria-pressed',String(isSelected));
+  });
 }
-timeBtns.forEach(b=>b.addEventListener('click',()=>setTrainingTime(Number(b.dataset.time))));
-minusTime.addEventListener('click',()=>setTrainingTime(trainingSeconds-5));
-plusTime.addEventListener('click',()=>setTrainingTime(trainingSeconds+5));
+
+timeBtns.forEach(button=>{
+  button.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    setTrainingTime(button.dataset.time);
+  });
+});
+
+minusTime.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopPropagation();
+  setTrainingTime(trainingSeconds-5);
+});
+
+plusTime.addEventListener('click',event=>{
+  event.preventDefault();
+  event.stopPropagation();
+  setTrainingTime(trainingSeconds+5);
+});
+
+setTrainingTime(trainingSeconds);
 
 btn.addEventListener('click',()=>{
   score=0;hits=0;misses=0;shots=0;reactions=[];
   updateStats();result.textContent='';delete start.dataset.finished;
-  start.querySelector('h2').textContent='30초 에임 연습';start.querySelector('p').textContent='타겟을 최대한 빠르게 클릭하세요.';
+  start.querySelector('h2').textContent=trainingSeconds+'초 에임 연습';start.querySelector('p').textContent='타겟을 최대한 빠르게 클릭하세요.';
   timeEl.textContent=trainingSeconds.toFixed(1);running=true;start.hidden=true;target.hidden=false;crosshair.hidden=false;
   mouseX=arena.clientWidth/2;mouseY=arena.clientHeight/2;placeCrosshair();spawn();
   endAt=performance.now()+trainingSeconds*1000;cancelAnimationFrame(raf);tick();arena.requestPointerLock();
